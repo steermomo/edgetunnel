@@ -21,7 +21,7 @@ if (!isValidUUID(userID)) {
 	throw new Error('uuid is not valid');
 }
 
-let parsedSocks5Address = {}; 
+let parsedSocks5Address = {};
 let enableSocks = false;
 
 // 虚假uuid和hostname，用于发送给配置生成服务
@@ -62,7 +62,7 @@ export default {
 			if (url.searchParams.has('notls')) tls = false;
 			if (!upgradeHeader || upgradeHeader !== 'websocket') {
 				// const url = new URL(request.url);
-				switch (url.pathname.toLowerCase()) {
+				switch (url.pathname) {
 				case '/':
 					return new Response(JSON.stringify(request.cf), { status: 200 });
 				case `/${userID}`: {
@@ -839,6 +839,32 @@ function generateUUID() {
 	return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5').toLowerCase();
 }
 
+
+/**
+ * @param {string} userID
+ * @param {string | null} hostName
+ * @param {string} sub
+ * @param {string} userAgent
+ * @returns {Promise<string>}
+ */
+async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyIP) {
+	let isBase64 = false;
+	// 生成surfboard的订阅配置
+	url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+	try {
+		const response = await fetch(url, {
+			headers: {
+				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+			}
+		});
+		content = await response.text();
+		return revertFakeInfo(content, userID, hostName, isBase64);
+	} catch (error) {
+		console.error('Error fetching content:', error);
+		return `Error fetching content: ${error.message}`;
+	}
+}
+
 /**
  * @param {string} userID
  * @param {string | null} hostName
@@ -850,7 +876,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-  
+
 		return `
 	################################################################
 	v2ray
@@ -879,12 +905,14 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	`;
 	} else if (sub && userAgent.includes('mozilla') && !userAgent.includes('linux x86')) {
 		const vlessMain = `vless://${userID}@${hostName}:443?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2048#${hostName}`;
-	
+
 		return `
 	################################################################
 	Subscribe / sub 订阅地址, 支持 Base64、clash-meta、sing-box 订阅格式, 您的订阅内容由 ${sub} 提供维护支持, 自动获取ProxyIP: ${RproxyIP}.
 	---------------------------------------------------------------
 	https://${hostName}/${userID}
+	---------------------------------------------------------------
+	https://${hostName}/surfboard/${userID}
 	---------------------------------------------------------------
 	################################################################
 	v2ray
@@ -923,7 +951,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			return 'Error: fetch is not available in this environment.';
 		}
 		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
-		if (hostName.includes(".workers.dev")){
+		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) {
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
 		} else if (hostName.includes(".pages.dev")){
 			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
@@ -944,10 +972,11 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			isBase64 = true;
 		}
 		try {
-			const response = await fetch(url ,{
-			headers: {
-				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
-			}});
+			const response = await fetch(url, {
+				headers: {
+					'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+				}
+			});
 			content = await response.text();
 			return revertFakeInfo(content, userID, hostName, isBase64);
 		} catch (error) {
