@@ -850,7 +850,7 @@ function generateUUID() {
 async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyIP) {
 	let isBase64 = false;
 	// 生成surfboard的订阅配置
-	url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+	let url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 	try {
 		const response = await fetch(url, {
 			headers: {
