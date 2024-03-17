@@ -101,7 +101,7 @@ export default {
 							return new Response(`${vlessConfig}`, {
 								status: 200,
 								headers: {
-									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
+									"Content-Disposition": "attachment; filename=edgetunnel.txt; filename*=utf-8''edgetunnel",
 									"Content-Type": "text/plain;charset=utf-8",
 									"Profile-Update-Interval": "6",
 									"Subscription-Userinfo": `upload=0; download=${Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776)}; total=${24 * 1099511627776}; expire=${timestamp}`,
@@ -866,6 +866,7 @@ function generateUUID() {
  */
 async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyIP) {
 	let isBase64 = false;
+	let content = "";
 	// 生成surfboard的订阅配置
 	let url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 	try {
