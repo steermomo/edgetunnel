@@ -917,32 +917,6 @@ async function getVLESSConfigWithTarget(target, userID, hostName, sub, userAgent
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
-async function getVLESSConfigWithTarget(userID, hostName, sub, userAgent, RproxyIP) {
-	let isBase64 = false;
-	let content = "";
-	// 生成surfboard的订阅配置
-	let url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-	try {
-		const response = await fetch(url, {
-			headers: {
-				'User-Agent': 'CF-Workers-edgetunnel/cmliu'
-			}
-		});
-		content = await response.text();
-		return revertFakeInfo(content, userID, hostName, isBase64);
-	} catch (error) {
-		console.error('Error fetching content:', error);
-		return `Error fetching content: ${error.message}`;
-	}
-}
-
-/**
- * @param {string} userID
- * @param {string | null} hostName
- * @param {string} sub
- * @param {string} userAgent
- * @returns {Promise<string>}
- */
 async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	// 如果sub为空，则显示原始内容
 	if (!sub || sub === '') {
