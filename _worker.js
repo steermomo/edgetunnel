@@ -120,13 +120,19 @@ export default {
 							today.setHours(0, 0, 0, 0);
 							const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
 
+							// return new Response(`${vlessConfig}`, {
+							// 	status: 200,
+							// 	headers: {
+							// 		"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
+							// 		"Content-Type": "text/plain;charset=utf-8",
+							// 		"Profile-Update-Interval": "6",
+							// 		"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
+							// 	}
+							// });
 							return new Response(`${vlessConfig}`, {
 								status: 200,
 								headers: {
-									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
 									"Content-Type": "text/plain;charset=utf-8",
-									"Profile-Update-Interval": "6",
-									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
 								}
 							});
 						}
