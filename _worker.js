@@ -93,9 +93,9 @@ export default {
 							});
 						}
 					}
-					case `/surfboard/${userID}`: {
+					case `/${target}/${userID}`: {
 						{
-							const vlessConfig = await getVLESSConfigSurfBoard(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+							const vlessConfig = await getVLESSConfigWithTarget(target, userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 							const now = Date.now();
 							const timestamp = Math.floor(now / 1000);
 							const today = new Date(now);
@@ -861,17 +861,18 @@ function generateUUID() {
 
 
 /**
+ * @param {string} target
  * @param {string} userID
  * @param {string | null} hostName
  * @param {string} sub
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
-async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyIP) {
+async function getVLESSConfigWithTarget(target, userID, hostName, sub, userAgent, RproxyIP) {
 	let isBase64 = false;
 	let content = "";
 	// 生成surfboard的订阅配置
-	let url = `https://${subconverter}/sub?target=surfboard&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+	let url = `https://${subconverter}/sub?target=${target}&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 	try {
 		const response = await fetch(url, {
 			headers: {
@@ -894,7 +895,7 @@ async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyI
  * @param {string} userAgent
  * @returns {Promise<string>}
  */
-async function getVLESSConfigSurfBoard(userID, hostName, sub, userAgent, RproxyIP) {
+async function getVLESSConfigWithTarget(userID, hostName, sub, userAgent, RproxyIP) {
 	let isBase64 = false;
 	let content = "";
 	// 生成surfboard的订阅配置
@@ -963,7 +964,7 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 	---------------------------------------------------------------
 	https://${hostName}/surfboard/${userID}
 	---------------------------------------------------------------
-	https://${hostName}/surfboard/${userID}
+	https://${hostName}/loon/${userID}
 	---------------------------------------------------------------
 	################################################################
 	v2ray
