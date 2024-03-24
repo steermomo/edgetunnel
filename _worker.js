@@ -93,7 +93,7 @@ export default {
 							}
 						}
 					case `/${userID}`: {
-						const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, '', RproxyIP);
+						const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, 'clash', RproxyIP);
 						const now = Date.now();
 						const timestamp = Math.floor(now / 1000);
 						const expire = 4102329600;//2099-12-31
