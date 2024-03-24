@@ -22,7 +22,6 @@ if (!isValidUUID(userID)) {
 }
 
 let parsedSocks5Address = {};
-let parsedSocks5Address = {};
 let enableSocks = false;
 
 // 虚假uuid和hostname，用于发送给配置生成服务
@@ -73,7 +72,7 @@ export default {
 						const expire = 4102329600;//2099-12-31
 						const today = new Date(now);
 						today.setHours(0, 0, 0, 0);
-						const UD = Math.floor(((now - today.getTime())/86400000) * 24 * 1099511627776 / 2);
+						const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
 						if (userAgent && userAgent.includes('mozilla')) {
 							return new Response(`${vlessConfig}`, {
 								status: 200,
@@ -93,13 +92,36 @@ export default {
 							});
 						}
 					}
-					case `/${target}/${userID}`: {
+					case `/loon/${userID}`: {
 						{
-							const vlessConfig = await getVLESSConfigWithTarget(target, userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+							const vlessConfig = await getVLESSConfigWithTarget('loon', userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
 							const now = Date.now();
 							const timestamp = Math.floor(now / 1000);
+							const expire = 4102329600;//2099-12-31
 							const today = new Date(now);
 							today.setHours(0, 0, 0, 0);
+							const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
+
+							return new Response(`${vlessConfig}`, {
+								status: 200,
+								headers: {
+									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
+									"Content-Type": "text/plain;charset=utf-8",
+									"Profile-Update-Interval": "6",
+									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
+								}
+							});
+						}
+					}
+					case `/surfboard/${userID}`: {
+						{
+							const vlessConfig = await getVLESSConfigWithTarget('surfboard', userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+							const now = Date.now();
+							const timestamp = Math.floor(now / 1000);
+							const expire = 4102329600;//2099-12-31
+							const today = new Date(now);
+							today.setHours(0, 0, 0, 0);
+							const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
 
 							return new Response(`${vlessConfig}`, {
 								status: 200,
@@ -1004,42 +1026,38 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 		}
 		// 如果是使用默认域名，则改成一个workers的域名，订阅器会加上代理
 		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) {
-		if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) {
-			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
-		} else if (hostName.includes(".pages.dev")){
-			fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
-		} else if (hostName.includes("worker") || hostName.includes("notls") || tls == false){
-			fakeHostName = `notls.${fakeHostName}${generateRandomNumber()}.net`;
-		} else {
-			fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
-		}
-		let content = "";
-		let url = "";
-		let isBase64 = false;
-		if (userAgent.includes('clash') && !userAgent.includes('nekobox')) {
-			url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-		} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
-			url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
-		} else {
-			url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
-			isBase64 = true;
-		}
-		try {
-			const response = await fetch(url, {
-				headers: {
-					'User-Agent': 'CF-Workers-edgetunnel/cmliu'
-				}
-			});
-			const response = await fetch(url, {
-				headers: {
-					'User-Agent': 'CF-Workers-edgetunnel/cmliu'
-				}
-			});
-			content = await response.text();
-			return revertFakeInfo(content, userID, hostName, isBase64);
-		} catch (error) {
-			console.error('Error fetching content:', error);
-			return `Error fetching content: ${error.message}`;
+			if (hostName.includes(".workers.dev") || hostName.includes(".pages.dev")) {
+				fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.workers.dev`;
+			} else if (hostName.includes(".pages.dev")) {
+				fakeHostName = `${fakeHostName}.${generateRandomString()}${generateRandomNumber()}.pages.dev`;
+			} else if (hostName.includes("worker") || hostName.includes("notls") || tls == false) {
+				fakeHostName = `notls.${fakeHostName}${generateRandomNumber()}.net`;
+			} else {
+				fakeHostName = `${fakeHostName}.${generateRandomNumber()}.xyz`
+			}
+			let content = "";
+			let url = "";
+			let isBase64 = false;
+			if (userAgent.includes('clash') && !userAgent.includes('nekobox')) {
+				url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+			} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
+				url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+			} else {
+				url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
+				isBase64 = true;
+			}
+			try {
+				const response = await fetch(url, {
+					headers: {
+						'User-Agent': 'CF-Workers-edgetunnel/cmliu'
+					}
+				});
+				content = await response.text();
+				return revertFakeInfo(content, userID, hostName, isBase64);
+			} catch (error) {
+				console.error('Error fetching content:', error);
+				return `Error fetching content: ${error.message}`;
+			}
 		}
 	}
 }
