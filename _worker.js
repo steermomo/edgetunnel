@@ -105,10 +105,7 @@ export default {
 							return new Response(`${vlessConfig}`, {
 								status: 200,
 								headers: {
-									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
 									"Content-Type": "text/plain;charset=utf-8",
-									"Profile-Update-Interval": "6",
-									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
 								}
 							});
 						}
@@ -895,6 +892,7 @@ async function getVLESSConfigWithTarget(target, userID, hostName, sub, userAgent
 	let content = "";
 	// 生成surfboard的订阅配置
 	let url = `https://${subconverter}/sub?target=${target}&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+	console.log('getVLESSConfigWithTarget url:', url);
 	try {
 		const response = await fetch(url, {
 			headers: {
