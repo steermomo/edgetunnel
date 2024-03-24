@@ -65,32 +65,47 @@ export default {
 				switch (url.pathname) {
 					case '/':
 						return new Response(JSON.stringify(request.cf), { status: 200 });
+					case `/status/${userID}`: {
+							const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, 'mozilla', RproxyIP);
+							const now = Date.now();
+							const timestamp = Math.floor(now / 1000);
+							const expire = 4102329600;//2099-12-31
+							const today = new Date(now);
+							today.setHours(0, 0, 0, 0);
+							const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
+							if (userAgent && userAgent.includes('mozilla')) {
+								return new Response(`${vlessConfig}`, {
+									status: 200,
+									headers: {
+										"Content-Type": "text/plain;charset=utf-8",
+									}
+								});
+							} else {
+								return new Response(`${vlessConfig}`, {
+									status: 200,
+									headers: {
+										"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
+										"Content-Type": "text/plain;charset=utf-8",
+										"Profile-Update-Interval": "6",
+										"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
+									}
+								});
+							}
+						}
 					case `/${userID}`: {
-						const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, userAgent, RproxyIP);
+						const vlessConfig = await getVLESSConfig(userID, request.headers.get('Host'), sub, '', RproxyIP);
 						const now = Date.now();
 						const timestamp = Math.floor(now / 1000);
 						const expire = 4102329600;//2099-12-31
 						const today = new Date(now);
 						today.setHours(0, 0, 0, 0);
 						const UD = Math.floor(((now - today.getTime()) / 86400000) * 24 * 1099511627776 / 2);
-						if (userAgent && userAgent.includes('mozilla')) {
-							return new Response(`${vlessConfig}`, {
-								status: 200,
-								headers: {
-									"Content-Type": "text/plain;charset=utf-8",
-								}
-							});
-						} else {
-							return new Response(`${vlessConfig}`, {
-								status: 200,
-								headers: {
-									"Content-Disposition": "attachment; filename=edgetunnel; filename*=utf-8''edgetunnel",
-									"Content-Type": "text/plain;charset=utf-8",
-									"Profile-Update-Interval": "6",
-									"Subscription-Userinfo": `upload=${UD}; download=${UD}; total=${24 * 1099511627776}; expire=${expire}`,
-								}
-							});
-						}
+						return new Response(`${vlessConfig}`, {
+							status: 200,
+							headers: {
+								"Content-Type": "text/plain;charset=utf-8",
+							}
+						});
 					}
 					case `/loon/${userID}`: {
 						{
@@ -1021,8 +1036,9 @@ async function getVLESSConfig(userID, hostName, sub, userAgent, RproxyIP) {
 			} else if (userAgent.includes('sing-box') || userAgent.includes('singbox')) {
 				url = `https://${subconverter}/sub?target=singbox&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
 			} else {
-				url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
-				isBase64 = true;
+				// url = `https://${sub}/sub?host=${fakeHostName}&uuid=${fakeUserID}&edgetunnel=cmliu&proxyip=${RproxyIP}`;
+				url = `https://${subconverter}/sub?target=clash&url=https%3A%2F%2F${sub}%2Fsub%3Fhost%3D${fakeHostName}%26uuid%3D${fakeUserID}%26edgetunnel%3Dcmliu%26proxyip%3D${RproxyIP}&insert=false&config=${encodeURIComponent(subconfig)}&emoji=true&list=false&tfo=false&scv=true&fdn=false&sort=false&new_name=true`;
+				isBase64 = false;
 			}
 			try {
 				const response = await fetch(url, {
